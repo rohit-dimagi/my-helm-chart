@@ -1,0 +1,33 @@
+# Default values for fuel_app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+app:
+  name: data-delivery-app
+  group: telematics
+  replicaCount: 1
+  namespace: telematics
+  env: dev
+  container:
+    image: 465252866563.dkr.ecr.ap-south-1.amazonaws.com/telematics:test_1
+    port: 8080
+    config: []
+  service:
+    type: ClusterIP
+    port: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+environment:
+  {
+    DATA_DELIVERY_URL: "http://localhost:3001",
+    DATA_DELIVERY_AUTHORIZATION: "abcd",
+    DATA_DELIVERY_BATCH_SIZE: "200",
+    BOOTSTRAP_SERVERS: "http://13.127.96.112:9092"
+  }

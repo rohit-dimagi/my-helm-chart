@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ default .Release.Namespace .Values.app.namespace }}
+  labels:
+    app: {{ .Values.app.name }}
+    group: {{ .Values.app.group }}
+    env: {{ .Values.app.env }}
+
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+      env: {{ .Values.app.env }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+        group: {{ .Values.app.group }}
+        env: {{ .Values.app.env }}
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}
+          image: {{ .Values.app.container.image }}
+          ports:
+            - containerPort: {{ .Values.app.container.port }}
+          env:
+            - name: fuel_app.database.url
+              value: {{required "Database URL Is MUST" .Values.environment.FUEL_APP_DATABASE_URL | quote}}
+            - name: fuel_app.database.username
+              value: {{required "Database username is must" .Values.environment.FUEL_APP_DATABASE_USERNAME | quote}}
+            - name: fuel_app.database.password
+              value: {{required "Database password is must" .Values.environment.FUEL_APP_DATABASE_PASSWORD | quote}}
+            - name: bootstrap.servers
+              value:
+                {{default "kafka.local" .Values.environment.BOOTSTRAP_SERVERS | quote}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+            

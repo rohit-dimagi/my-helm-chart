@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ default .Release.Namespace .Values.app.namespace }}
+  labels:
+    app: {{ .Values.app.name }}
+    group: {{ .Values.app.group }}
+    env: {{ .Values.app.env }}
+
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+      env: {{ .Values.app.env }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+        group: {{ .Values.app.group }}
+        env: {{ .Values.app.env }}
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}
+          image: {{ .Values.app.container.image }}
+          ports:
+            - containerPort: {{ .Values.app.container.port }}
+          env:
+            - name: data_delivery.url
+              value:
+                {{required "You must set a valid URL for data delivery" .Values.environment.DATA_DELIVERY_URL | quote}}
+            - name: data_delivery.authorization
+              value:
+                {{required "You must set authorization" .Values.environment.DATA_DELIVERY_AUTHORIZATION | quote}}
+            - name: data_delivery.batch_size
+              value:
+                {{default "2000" .Values.environment.DATA_DELIVERY_BATCH_SIZE | quote}}
+            - name: bootstrap.servers
+              value:
+                {{default "kafka.local" .Values.environment.BOOTSTRAP_SERVERS | quote}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+            
