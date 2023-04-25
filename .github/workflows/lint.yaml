@@ -88,8 +88,10 @@ jobs:
       - name: package helm
         run: |
           helm package charts/${{ matrix.directory }}
-      - name: Application Version
-        id: version
-        uses: paulhatch/semantic-version@v5.0.2
-        with:
-          change_path: "charts/${{ matrix.directory }}"
+      - name: run pip
+        run: |
+          pip3 install pygithub
+      - name: run script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 app.py
