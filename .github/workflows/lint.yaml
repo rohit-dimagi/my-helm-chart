@@ -69,10 +69,13 @@ jobs:
           done
           unique_folders=($(printf "%s\n" "${folders[@]}" | cut -d '/' -f2 | sort -u | tr '\n' ' '))
           echo "directories=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${unique_folders[@]})" >> $GITHUB_OUTPUT
-
+      - name: run cat
+        run: echo ${{ steps.transform.outputs.directories }}
+        
   release:
     runs-on: ubuntu-latest
     needs: changes
+    permissions: write-all
     strategy:
       matrix:
         directory: ${{ fromJSON(needs.changes.outputs.directories) }}
