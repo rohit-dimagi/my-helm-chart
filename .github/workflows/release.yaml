@@ -1,0 +1,41 @@
+name: Release Helm charts
+
+on:
+  workflow_call:  
+    inputs:
+      charts:
+        required: true
+        type: string
+      # chart_details:
+      #   required: true
+      #   type: string
+# ['guestbook', 'hello-world']
+# [{"guestbook": "0.1.0", "hello-world": "0.0.2"}]
+jobs:
+  release:
+    name: Release helm charts
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    strategy:
+      matrix:
+        charts: ${{ fromJSON(inputs.charts).directories }}
+    steps:
+      - name: Github Checkout
+        uses: actions/checkout@v3
+      - name: Output chart details input
+        run: |
+          echo "chart_details: ${{ inputs.charts }}"
+          echo "chart_details: ${{ inputs.charts.directories }}"
+          echo "chart_details: ${{ fromJSON(inputs.charts) }}"
+          echo "chart_details: ${{ fromJSON(inputs.charts).directories[0] }}"
+      # - name: Output chart details
+      #   run: |
+      #     echo "chart_details: ${{ fromJSON(inputs.charts).directories }}"
+      # - name: Output chart details
+      #   run: |
+      #     echo "chart_details: ${{ fromJSON(inputs.chart_details) }}"
+      - name: Run Deploy Script
+        run: |
+          echo  "${{ fromJSON(inputs.charts).versions[matrix.charts] }}"
